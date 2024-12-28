@@ -2,20 +2,44 @@ import React, { useEffect, useState } from 'react';
 import client from '../mqttClient';
 import '../styles.css';
 
-
 const SensorData = () => {
-  const [sensorData, setSensorData] = useState({});
+  const [sensorData, setSensorData] = useState({
+    light: null,
+    pir: null,
+  });
 
   useEffect(() => {
-    client.subscribe('esp32/sensor', { qos: 1 });
+    // Subscribe to both light and PIR topics
+    client.subscribe('sensor/light', { qos: 1 });
+    client.subscribe('sensor/pir', { qos: 1 });
+
+    // Handle incoming messages
     client.on('message', (topic, payload) => {
-      if (topic === 'esp32/sensor') {
-        setSensorData(JSON.parse(payload.toString()));
+      console.log('Received message:', payload.toString());
+
+      try {
+        const parsedData = JSON.parse(payload.toString());
+        
+        if (topic === 'sensor/light') {
+          setSensorData((prevData) => ({
+            ...prevData,
+            light: parsedData.light,
+          }));
+        } else if (topic === 'sensor/pir') {
+          setSensorData((prevData) => ({
+            ...prevData,
+            pir: parsedData.pir,
+          }));
+        }
+      } catch (error) {
+        console.error('Error parsing message:', error);
       }
     });
 
+    // Cleanup subscriptions on unmount
     return () => {
-      client.unsubscribe('esp32/sensor');
+      client.unsubscribe('sensor/light');
+      client.unsubscribe('sensor/pir');
     };
   }, []);
 

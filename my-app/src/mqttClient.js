@@ -1,10 +1,8 @@
 import mqtt from 'mqtt';
 
-const MQTT_BROKER_URL = 'wss://broker.hivemq.com:8000/mqtt'; // Replace with your broker's URL
+const MQTT_BROKER_URL = "ws://192.168.33.225"; // Replace with your broker's URL
 const MQTT_OPTIONS = {
-  clientId: `mqtt_${Math.random().toString(16).slice(3)}`,
-  username: '', // Add credentials if required
-  password: '',
+  port: 9001,
 };
 
 const client = mqtt.connect(MQTT_BROKER_URL, MQTT_OPTIONS);

@@ -1,30 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import client from '../mqttClient';
-import '../styles.css';
-
 
 const VideoFeed = () => {
   const [videoSrc, setVideoSrc] = useState('');
 
   useEffect(() => {
-    client.subscribe('esp32/camera', { qos: 1 });
-    client.on('message', (topic, payload) => {
-      if (topic === 'esp32/camera') {
-        setVideoSrc(`data:image/jpeg;base64,${payload.toString()}`);
-      }
-    });
+    // The ESP32-CAM is serving the video feed at this URL
+    const streamUrl = 'http://192.168.33.180/stream'; // Update with your ESP32-CAM IP address
 
-    return () => {
-      client.unsubscribe('esp32/camera');
-    };
+    // Set the video source to the ESP32-CAM stream URL
+    setVideoSrc(streamUrl);
   }, []);
 
   return (
     <div className="card">
       <h2>Video Feed</h2>
       <div className="img-container">
-        {videoSrc ? (
-          <img src={videoSrc} alt="ESP Camera Feed" />
+        {videoSrc ? ( 
+          <img src={videoSrc} alt="ESP32 Camera Feed" width="640" height="480" />
         ) : (
           <p>No video feed available</p>
         )}
